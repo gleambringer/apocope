@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>APOCOPE</title>
+    <style>
+        :root {
+            --bg: #1a0033;
+            --container-bg: #2d004d;
+            --text: #ffffff;
+            --accent: #39ff14;
+            --radius: 8px;
+        }
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', system-ui, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background: var(--container-bg);
+            padding: 40px;
+            border-radius: var(--radius);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5), 0 0 15px rgba(57, 255, 20, 0.1);
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+            border: 1px solid rgba(57, 255, 20, 0.2);
+        }
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 15px;
+            letter-spacing: 2px;
+            color: var(--accent);
+            text-shadow: 3px 3px 0px rgba(0, 0, 0, 0.5);
+            font-weight: 900;
+        }
+        .hint-box {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 24px;
+            font-size: 0.85rem;
+            line-height: 1.6;
+            color: #d1d1d1;
+            text-align: left;
+            border-left: 4px solid var(--accent);
+        }
+        input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 16px;
+            border: 2px solid #4d0080;
+            border-radius: var(--radius);
+            background: #000;
+            color: var(--accent);
+            margin-bottom: 12px;
+            font-size: 1.1rem;
+            outline: none;
+            transition: all 0.2s;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+        }
+        input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 10px rgba(57, 255, 20, 0.3);
+        }
+        button {
+            width: 100%;
+            padding: 16px;
+            background: var(--accent);
+            color: #000;
+            border: none;
+            border-radius: var(--radius);
+            font-size: 1.1rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: transform 0.1s, box-shadow 0.2s;
+            box-shadow: 0 4px 0px #2db310;
+        }
+        button:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0px #2db310;
+        }
+        #message {
+            margin-top: 25px;
+            font-size: 1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>APOCOPE</h1>
+        
+        <div class="hint-box">
+            <strong>CLUES:</strong><br>
+            • 23 characters total.<br>
+            • Word 1: Capitalized, past tense action.<br>
+            • Word 2: Short word for noun quantity.<br>
+            • Word 3: Used in writing.<br>
+            • Final: 2 special characters and a word.
+        </div>
+
+        <input type="password" id="pass" placeholder="PASSWORD">
+        <button onclick="send()">Check</button>
+        <div id="message"></div>
+    </div>
+
+    <script>
+        async function send() {
+            const attempt = document.getElementById('pass').value;
+            const msgDiv = document.getElementById('message');
+            
+            try {
+                const res = await fetch('/verify', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ attempt })
+                });
+                const data = await res.json();
+                
+                msgDiv.innerText = data.msg;
+                msgDiv.style.color = data.status === 'win' ? 'var(--accent)' : '#ff3131';
+                
+                if (data.status === 'win') {
+                    document.getElementById('pass').disabled = true;
+                    document.querySelector('button').style.display = 'none';
+                    document.querySelector('.container').style.borderColor = 'var(--accent)';
+                    document.querySelector('.container').style.boxShadow = '0 0 30px rgba(57, 255, 20, 0.4)';
+                }
+            } catch (e) {
+                msgDiv.innerText = "LINK FAILURE";
+                msgDiv.style.color = "#ff3131";
+            }
+        }
+    </script>
+</body>
+</html>
